@@ -1,10 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: 'https://the-engineering-market.onrender.com/api',
 });
 
-// Attach JWT token to every request if present
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('em_token');
@@ -16,13 +15,11 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Handle 401 responses globally (e.g., expired token)
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('em_token');
-      // Redirect to login only if not already there
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
