@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Upload, AlertCircle, ShoppingBag, Eye, User, Sparkles } from 'lucide-react';
 import api from '../lib/axios';
+import { useAuth } from '../context/AuthContext';
 
 const CATEGORIES = [
   'Books',

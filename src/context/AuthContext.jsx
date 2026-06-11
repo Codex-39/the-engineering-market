@@ -14,18 +14,23 @@ export const AuthProvider = ({ children }) => {
   // On mount, check if we have a stored token and validate it
   useEffect(() => {
     const checkLoggedIn = async () => {
-      const token = localStorage.getItem('em_token');
-      if (token) {
-        try {
-          const res = await api.get('/auth/profile');
-          setUser(res.data);
-        } catch (error) {
-          console.error('Session expired or invalid token');
-          localStorage.removeItem('em_token');
-          setUser(null);
+      try {
+        const token = localStorage.getItem('em_token');
+        if (token) {
+          try {
+            const res = await api.get('/auth/profile');
+            setUser(res.data);
+          } catch (error) {
+            console.error('Session expired or invalid token');
+            localStorage.removeItem('em_token');
+            setUser(null);
+          }
         }
+      } catch (err) {
+        console.error('Auth initialization error:', err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     checkLoggedIn();
@@ -64,7 +69,14 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {loading ? (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
+          <div className="w-12 h-12 rounded-full border-4 border-slate-200 border-t-blue-600 animate-spin mb-4"></div>
+          <p className="text-slate-500 font-medium animate-pulse">Connecting to server...</p>
+        </div>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 };
