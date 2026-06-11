@@ -12,13 +12,17 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 // @access  Public
 export const registerUser = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, role, profileState, profileCity, profileCollege } = req.body;
 
   try {
     const userExists = await User.findOne({ email });
 
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
+    }
+
+    if (!profileState || !profileCity) {
+      return res.status(400).json({ message: 'State and City are required fields' });
     }
 
     // Only allow 'user' or 'engineer' during self-registration
@@ -30,6 +34,9 @@ export const registerUser = async (req, res) => {
       email,
       password,
       role: userRole,
+      profileState,
+      profileCity,
+      profileCollege,
     });
 
     if (user) {
@@ -38,6 +45,9 @@ export const registerUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        profileState: user.profileState,
+        profileCity: user.profileCity,
+        profileCollege: user.profileCollege,
         token: generateToken(user._id),
       });
     } else {
@@ -63,6 +73,9 @@ export const loginUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        profileState: user.profileState,
+        profileCity: user.profileCity,
+        profileCollege: user.profileCollege,
         token: generateToken(user._id),
       });
     } else {
@@ -86,6 +99,9 @@ export const getUserProfile = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        profileState: user.profileState,
+        profileCity: user.profileCity,
+        profileCollege: user.profileCollege,
       });
     } else {
       res.status(404).json({ message: 'User not found' });

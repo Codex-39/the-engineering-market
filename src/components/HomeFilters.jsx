@@ -16,6 +16,8 @@ export const HomeFilters = ({ onFilterChange }) => {
   const [college, setCollege] = useState(searchParams.get('college') || '');
   const [category, setCategory] = useState(searchParams.get('category') || '');
   const [search, setSearch] = useState(searchParams.get('search') || '');
+  const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
+  const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
 
   const [statesOptions, setStatesOptions] = useState([]);
   const [citiesOptions, setCitiesOptions] = useState([]);
@@ -68,7 +70,7 @@ export const HomeFilters = ({ onFilterChange }) => {
       }
     };
     fetchColleges();
-  }, [city]);
+  }, [city, state]);
 
   // Push filter changes up
   const applyFilters = () => {
@@ -78,6 +80,8 @@ export const HomeFilters = ({ onFilterChange }) => {
     if (city) params.city = city;
     if (college) params.college = college;
     if (category) params.category = category;
+    if (minPrice) params.minPrice = minPrice;
+    if (maxPrice) params.maxPrice = maxPrice;
     setSearchParams(params);
     onFilterChange(params);
   };
@@ -86,7 +90,7 @@ export const HomeFilters = ({ onFilterChange }) => {
   useEffect(() => {
     applyFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, state, city, college, category]);
+  }, [search, state, city, college, category, minPrice, maxPrice]);
 
   const clearAll = () => {
     setSearch('');
@@ -94,6 +98,8 @@ export const HomeFilters = ({ onFilterChange }) => {
     setCity('');
     setCollege('');
     setCategory('');
+    setMinPrice('');
+    setMaxPrice('');
     setSearchParams({});
     onFilterChange({});
   };
@@ -172,6 +178,27 @@ export const HomeFilters = ({ onFilterChange }) => {
         <option value="Hostel Essentials">Hostel Essentials</option>
         <option value="Others">Others</option>
       </select>
+
+      {/* Price inputs */}
+      <div className="flex items-center gap-2">
+        <input
+          type="number"
+          placeholder="Min ₹"
+          value={minPrice}
+          onChange={(e) => setMinPrice(e.target.value)}
+          className="input text-sm w-[90px] py-2 px-3"
+          min={0}
+        />
+        <span className="text-textSubtle text-xs">-</span>
+        <input
+          type="number"
+          placeholder="Max ₹"
+          value={maxPrice}
+          onChange={(e) => setMaxPrice(e.target.value)}
+          className="input text-sm w-[90px] py-2 px-3"
+          min={0}
+        />
+      </div>
 
       {/* Clear button */}
       <button

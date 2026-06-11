@@ -6,6 +6,18 @@ import Listing from '../models/Listing.js';
 export const createListing = async (req, res) => {
   const { title, description, price, category, condition, images, state, city, college } = req.body;
 
+  console.log('Incoming createListing payload:', { title, price, category, condition, imagesCount: images?.length, state, city, college });
+  
+  if (!title || !description || !price || !category || !condition || !state || !city || !college) {
+    console.error('Validation failure: Missing required listing fields');
+    return res.status(400).json({ message: 'Please provide all required fields: Title, Description, Price, Category, Condition, State, City, and College.' });
+  }
+
+  if (!images || images.length === 0) {
+    console.error('Validation failure: Missing images');
+    return res.status(400).json({ message: 'Please upload at least one image.' });
+  }
+
   try {
     const listing = await Listing.create({
       title,
@@ -20,9 +32,11 @@ export const createListing = async (req, res) => {
       seller: req.user._id,
     });
 
+    console.log('Listing successfully created in Mongo:', listing._id);
     res.status(201).json(listing);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error('Error in createListing:', error);
+    res.status(400).json({ message: 'Listing creation failed: ' + error.message });
   }
 };
 
@@ -57,6 +71,18 @@ export const getListings = async (req, res) => {
   }
   if (category && category !== 'All') {
     query.category = category;
+  }
+
+  // Price range filter
+  const { minPrice, maxPrice } = req.query;
+  if (minPrice || maxPrice) {
+    query.price = {};
+    if (minPrice) {
+      query.price.$gte = Number(minPrice);
+    }
+    if (maxPrice) {
+      query.price.$lte = Number(maxPrice);
+    }
   }
 
   // Search across text fields including location fields

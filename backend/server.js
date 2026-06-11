@@ -6,6 +6,7 @@ import authRoutes from './routes/authRoutes.js';
 import listingRoutes from './routes/listingRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import locationRoutes from './routes/locationRoutes.js';
 
 // Load config
 dotenv.config();
@@ -37,6 +38,7 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/listings', listingRoutes);
 app.use('/api/chats', chatRoutes);
+app.use('/api/locations', locationRoutes);
 
 // Base route
 app.get('/', (req, res) => {

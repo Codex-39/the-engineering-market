@@ -19,6 +19,8 @@ const CONDITIONS = ['New', 'Like New', 'Good', 'Fair'];
 export const SellItem = () => {
   const navigate = useNavigate();
 
+  const { user } = useAuth();
+
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [condition, setCondition] = useState(CONDITIONS[2]); // Default: Good
@@ -28,52 +30,90 @@ export const SellItem = () => {
   const [state, setState] = useState('');
   const [city, setCity] = useState('');
   const [college, setCollege] = useState('');
+  const [customCollege, setCustomCollege] = useState('');
+  const [isCustomCollege, setIsCustomCollege] = useState(false);
   const [statesOptions, setStatesOptions] = useState([]);
   const [citiesOptions, setCitiesOptions] = useState([]);
   const [collegesOptions, setCollegesOptions] = useState([]);
-const [loading, setLoading] = useState(false);
-const [error, setError] = useState('');
-const previewImage = images[0] || null;
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const previewImage = images[0] || null;
+
   // Load state options on mount
   useEffect(() => {
     const fetchStates = async () => {
       try {
         const res = await api.get('/locations/states');
         setStatesOptions(res.data || []);
+        
+        // Auto-fill state from user profile if available
+        if (user?.profileState) {
+          setState(user.profileState);
+        }
       } catch (e) {
         console.error('Failed to load states', e);
       }
     };
     fetchStates();
-  }, []);
+  }, [user]);
 
   // Load cities when state changes
   useEffect(() => {
-    if (!state) return;
+    if (!state) {
+      setCitiesOptions([]);
+      setCity('');
+      return;
+    }
     const fetchCities = async () => {
       try {
         const res = await api.get('/locations/cities', { params: { state } });
         setCitiesOptions(res.data || []);
+        
+        // Auto-fill city from user profile if it belongs to selected state
+        if (user?.profileCity && user.profileState === state) {
+          setCity(user.profileCity);
+        } else {
+          setCity('');
+        }
       } catch (e) {
         console.error('Failed to load cities', e);
       }
     };
     fetchCities();
-  }, [state]);
+  }, [state, user]);
 
   // Load colleges when city changes
   useEffect(() => {
-    if (!city) return;
+    if (!city) {
+      setCollegesOptions([]);
+      setCollege('');
+      return;
+    }
     const fetchColleges = async () => {
       try {
         const res = await api.get('/locations/colleges', { params: { state, city } });
         setCollegesOptions(res.data || []);
+        
+        // Auto-fill college from user profile if details match
+        if (user?.profileCollege && user.profileState === state && user.profileCity === city) {
+          if (res.data && res.data.includes(user.profileCollege)) {
+            setCollege(user.profileCollege);
+            setIsCustomCollege(false);
+          } else {
+            setCollege('custom');
+            setCustomCollege(user.profileCollege);
+            setIsCustomCollege(true);
+          }
+        } else {
+          setCollege('');
+          setIsCustomCollege(false);
+        }
       } catch (e) {
         console.error('Failed to load colleges', e);
       }
     };
     fetchColleges();
-  }, [city]);
+  }, [city, state, user]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -89,6 +129,14 @@ const previewImage = images[0] || null;
       return;
     }
 
+    const finalCollege = college === 'custom' ? customCollege : college;
+
+    if (!state || !city || !finalCollege) {
+      setError('Please select a valid State, City, and College.');
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       await api.post('/listings', {
@@ -100,7 +148,7 @@ const previewImage = images[0] || null;
         images,
         state,
         city,
-        college,
+        college: finalCollege,
       });
       // Redirect to homepage after posting
       navigate('/');
@@ -195,14 +243,38 @@ const previewImage = images[0] || null;
             </div>
             <div>
               <label className="block text-xs font-bold text-text uppercase tracking-wider mb-2">College *</label>
-              <select value={college} onChange={(e) => setCollege(e.target.value)} className="input text-sm bg-white" disabled={!city}>
+              <select
+                value={college}
+                onChange={(e) => {
+                  setCollege(e.target.value);
+                  setIsCustomCollege(e.target.value === 'custom');
+                }}
+                className="input text-sm bg-white"
+                disabled={!city}
+              >
                 <option value="">Select College</option>
                 {collegesOptions.map((col) => (
                   <option key={col} value={col}>{col}</option>
                 ))}
+                <option value="custom">Other / Custom College</option>
               </select>
             </div>
           </div>
+
+          {/* Custom College Input */}
+          {isCustomCollege && (
+            <div>
+              <label className="block text-xs font-bold text-text uppercase tracking-wider mb-2">Specify College Name *</label>
+              <input
+                type="text"
+                required
+                placeholder="Enter your college full name..."
+                value={customCollege}
+                onChange={(e) => setCustomCollege(e.target.value)}
+                className="input text-sm"
+              />
+            </div>
+          )}
 
           {/* Category & Condition */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

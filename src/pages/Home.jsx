@@ -23,6 +23,8 @@ export const Home = () => {
   const state = searchParams.get('state') || '';
   const city = searchParams.get('city') || '';
   const college = searchParams.get('college') || '';
+  const minPrice = searchParams.get('minPrice') || '';
+  const maxPrice = searchParams.get('maxPrice') || '';
   const categoryParam = searchParams.get('category') || '';
 
   const [listings, setListings] = useState([]);
@@ -54,6 +56,8 @@ export const Home = () => {
             state: state || undefined,
             city: city || undefined,
             college: college || undefined,
+            minPrice: minPrice || undefined,
+            maxPrice: maxPrice || undefined,
             category: activeCategory === 'All' ? undefined : activeCategory,
             limit,
             page,
@@ -69,7 +73,7 @@ export const Home = () => {
     };
 
     fetchListings();
-  }, [searchVal, activeCategory, state, city, college]);
+  }, [searchVal, activeCategory, state, city, college, minPrice, maxPrice]);
 
   const scrollToBrowse = () => {
     productsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
