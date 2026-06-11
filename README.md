@@ -155,6 +155,7 @@ npm run dev
 ## Use Case
 
 Engineering students often have textbooks, calculators, drafter tools, lab equipment, and project components that become unused after a semester. The Engineering Market provides a dedicated platform where students can sell these items to other students at affordable prices.
+<img width="1747" height="907" alt="image" src="https://github.com/user-attachments/assets/a5d59bb0-ea70-42e0-94bc-9e0e477a29cb" />
 
 ---
 
