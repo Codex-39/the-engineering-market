@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-text font-sans antialiased;
+  }
+
+  /* Prevent layout shift on scrollbar */
+  html {
+    scrollbar-gutter: stable;
+  }
+}
+
+@layer components {
+  /* Buttons */
+  .btn {
+    @apply px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer active:scale-[0.97];
+  }
+  .btn-primary {
+    @apply bg-primary hover:bg-primaryHover text-white shadow-md shadow-primary/10 hover:shadow-lg hover:shadow-primary/20;
+  }
+  .btn-accent {
+    @apply bg-accent hover:bg-accentHover text-white shadow-md shadow-accent/10 hover:shadow-lg hover:shadow-accent/20;
+  }
+  .btn-danger {
+    @apply bg-danger hover:bg-red-600 text-white shadow-md shadow-danger/10;
+  }
+  .btn-outline {
+    @apply border border-slate-200 hover:bg-slate-50 text-textMuted hover:text-text;
+  }
+  .btn-ghost {
+    @apply text-textMuted hover:text-text hover:bg-slate-50;
+  }
+
+  /* Inputs */
+  .input {
+    @apply w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-text placeholder-textSubtle focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-surface border border-slate-100 rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)];
+  }
+  .glass {
+    @apply bg-surface/80 backdrop-blur-xl border border-white/20;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-300;
+}
+
+/* Selection */
+::selection {
+  @apply bg-primary/10 text-primary;
+}
